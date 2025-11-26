@@ -1,3 +1,4 @@
+import supabase from '@/supabase';
 import Checkbox from 'expo-checkbox';
 import { UseFormReturn } from 'react-hook-form';
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
@@ -20,8 +21,26 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
     }
 
     // Submit handler
-    const onSubmit = (data: User) => {
-      console.log(data)
+    async function onSubmit (data: User) {
+      if (!data) {
+        return;
+      } 
+
+      const { email, password, username } = form.getValues();
+      const { error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            displayName: username,
+          }
+        }
+      });
+    
+      if (error) {
+        console.log('Sign up error:', error.message);
+        return;
+      }
 
       //Reset form after submission
       setPageNum({ page: 0 });
