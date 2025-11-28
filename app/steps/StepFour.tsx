@@ -1,5 +1,6 @@
 import supabase from '@/supabase';
 import Checkbox from 'expo-checkbox';
+import { useRouter } from 'expo-router';
 import { UseFormReturn } from 'react-hook-form';
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 import { Goals, User } from '../types';
@@ -7,6 +8,8 @@ import { Goals, User } from '../types';
 export default function StepFour({ form, goals, setGoals, setPageNum }: StepProps) {
 
     const { setValue, handleSubmit } = form;
+
+    const router = useRouter();
 
     // If goal is already selected, remove it; otherwise, add it (using filter)
     function toggleGoal(goal: Goals) {
@@ -43,6 +46,9 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
       }
 
       //Reset form after submission
+      console.log("email: ", email);
+      console.log("password: ", password);
+      router.navigate('/LoginScreen')
       setPageNum({ page: 0 });
     }
 
