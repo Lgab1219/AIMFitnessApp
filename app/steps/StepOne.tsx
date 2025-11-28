@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 8,
     backgroundColor: '#F0803C',
+    paddingTop: '5%'
   },
 
   titleStyle: {
