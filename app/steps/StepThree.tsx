@@ -16,11 +16,11 @@ export default function StepThree({ nextPage, form }: { nextPage: () => void; fo
             <Controller control={control}
             rules={{ required: true, }} render={({ field: { onChange, value } }) => (
               <>
-              <TouchableHighlight underlayColor='#F0803C' style={styles.genderStyle} onPress={() => {onChange('male')}}>
+              <TouchableHighlight underlayColor='#F0803C' style={[styles.genderStyle, value === 'male' && styles.selectedGenderStyle]} onPress={() => {onChange('male')}}>
                 <Image source={require('../../assets/images/man.webp')} />
               </TouchableHighlight>
 
-              <TouchableHighlight underlayColor='#F0803C' style={styles.genderStyle} onPress={() => {onChange('female')}}>
+              <TouchableHighlight underlayColor='#F0803C' style={[styles.genderStyle, value === 'female' && styles.selectedGenderStyle]} onPress={() => {onChange('female')}}>
                 <Image source={require('../../assets/images/woman.webp')} />
               </TouchableHighlight>
               </>
@@ -83,5 +83,11 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderRadius: 5,
     alignItems: 'center',
-  }
+  },
+
+  selectedGenderStyle: {
+    borderWidth: 2,
+    borderColor: '#ffffff',
+    backgroundColor: '#f0803c',
+  },
 });
