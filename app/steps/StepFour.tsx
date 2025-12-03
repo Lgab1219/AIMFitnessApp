@@ -26,9 +26,16 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
     }
 
     async function insertUserData() {
+      const { data: user } = await supabase.auth.getUser();
+
+      if (!user.user) {
+        return;
+      }
+
       const { error } = await supabase
         .from('users')
         .insert({
+          id: user.user?.id,
           username: username,
           age: age,
           current_weight: current_weight,
