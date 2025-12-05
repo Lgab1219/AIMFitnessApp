@@ -1,6 +1,8 @@
 import supabase from "@/supabase";
+import { GoogleGenAI } from "@google/genai";
+import Constants from 'expo-constants';
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
 
 export default function DashboardScreen() {
@@ -8,6 +10,18 @@ export default function DashboardScreen() {
   // Create seperate AI file to use fetched values to generate starting values (calorie budget) for user profile
   // Before generating values, check if user profile already has values set
   // Turn AI's string output and store into a variable to be displayed on the dashboard screen
+
+  const googleApiKey = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
+
+  if (!googleApiKey) {
+    console.log("Google API Key is missing");
+  }
+
+  // Initialize AI client
+  const ai = new GoogleGenAI({ apiKey: googleApiKey });
+
+  // State to hold user data
+  const [userData, setUserData] = useState<any>(null);
 
   // Router instance for navigation
   const router = useRouter();
@@ -34,10 +48,11 @@ export default function DashboardScreen() {
         return;
       }
 
-      console.log("USER DATA: ", data);
+      setUserData(data);
     }
 
     fetchUserData();
+    generateStartingValues();
   }, []);
 
   async function logOut() {
@@ -49,6 +64,26 @@ export default function DashboardScreen() {
     }
 
     router.navigate('/LoginScreen');
+  }
+
+  async function generateStartingValues() {
+    if (!userData) return;
+
+    const prompt = `Generate personalized daily calorie budget, protein, carbohydrate, and fat intake values for a user based on the following profile:
+    Age: ${userData.age}
+    Gender: ${userData.gender}
+    Current Weight: ${userData.current_weight}
+    Target Weight: ${userData.target_weight}
+    Height: ${userData.height}
+    Goals: ${userData.goals}
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt
+    });
+
+    console.log("AI Response: ", response.text);
   }
 
     return (
