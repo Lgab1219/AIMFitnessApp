@@ -93,13 +93,25 @@ export default function DashboardScreen() {
 
     return (
         <>
-            <ScrollView style={{ flex: 1, backgroundColor: '#F0803C', paddingTop: '30%' }}>
+            <ScrollView style={{ flex: 1, backgroundColor: '#2E2D2D', paddingTop: '30%' }}>
                 <View style={styles.titleContainer}>
-                    <Text style={styles.titleStyle}>Dashboard</Text>
+                    <Text style={{ color: '#ffffff', textAlign: 'center' }}>Calorie Budget</Text>
+                    <Text style={styles.titleStyle}>0</Text>
+                </View>
+
+                <View style={styles.titleContainer}>
+                    <Text style={{ color: '#ffffff', textAlign: 'center' }}>Current Calories</Text>
+                    <Text style={styles.titleStyle}>2,600</Text>
                 </View>
 
                 <View>
-                  <TouchableHighlight underlayColor='#f0803c' style={{ backgroundColor: '#f0803c' }} onPress={logOut}>
+                  <TouchableHighlight underlayColor='#f0803c' style={styles.buttonStyle} onPress={logOut}>
+                    <Text style={{ textAlign: 'center', color: '#ffffff' }}>Input Food</Text>
+                  </TouchableHighlight>
+                </View>
+
+                <View>
+                  <TouchableHighlight underlayColor='#2E2D2D' style={{ backgroundColor: '#2E2D2D', marginTop: '20%' }} onPress={logOut}>
                     <Text style={{ color: '#ffffff', textAlign: 'center' }}>Logout</Text>
                   </TouchableHighlight>
                 </View>
@@ -112,7 +124,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'column',
     gap: 8,
-    backgroundColor: '#F0803C',
+    backgroundColor: '#2E2D2D',
     paddingInline: "5%"
   },
 
@@ -122,5 +134,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     paddingBottom: 20,
+  },
+
+  buttonStyle: {
+    backgroundColor: '#f0803c',
+    padding: 20,
+    borderRadius: 5,
+    width: '70%',
+    alignSelf: 'center',
   },
 })
