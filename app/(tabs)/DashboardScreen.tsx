@@ -1,6 +1,5 @@
 import supabase from "@/supabase";
 import { GoogleGenAI } from "@google/genai";
-import Constants from 'expo-constants';
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
@@ -11,7 +10,7 @@ export default function DashboardScreen() {
   // Before generating values, check if user profile already has values set
   // Turn AI's string output and store into a variable to be displayed on the dashboard screen
 
-  const googleApiKey = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
+  const googleApiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY as string;
 
   if (!googleApiKey) {
     console.log("Google API Key is missing");
@@ -52,8 +51,14 @@ export default function DashboardScreen() {
     }
 
     fetchUserData();
-    generateStartingValues();
   }, []);
+
+  // Generate starting values when userData is set
+/*  useEffect(() => {
+    if (userData) {
+      generateStartingValues();
+    }
+  }, [userData]);*/
 
   async function logOut() {
     const { error } = await supabase.auth.signOut();
