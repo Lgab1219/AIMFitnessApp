@@ -2,9 +2,6 @@
   "expo": {
     "name": "AIM",
     "slug": "AIM",
-    "extra": {
-      "GOOGLE_API_KEY": "AIzaSyAi3XgfsgVI9C6YDxnipWpQ2rlUppLVr44"
-    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
