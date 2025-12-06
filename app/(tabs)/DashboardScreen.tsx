@@ -105,7 +105,7 @@ export default function DashboardScreen() {
                 </View>
 
                 <View>
-                  <TouchableHighlight underlayColor='#f0803c' style={styles.buttonStyle} onPress={logOut}>
+                  <TouchableHighlight underlayColor='#f0803c' style={styles.buttonStyle} onPress={() => router.navigate('/SearchWindow')}>
                     <Text style={{ textAlign: 'center', color: '#ffffff' }}>Input Food</Text>
                   </TouchableHighlight>
                 </View>
