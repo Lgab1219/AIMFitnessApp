@@ -9,6 +9,8 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
 
     const { setValue, handleSubmit } = form;
 
+    const { email, password, username, age, current_weight, target_weight, height, gender } = form.getValues();
+
     const router = useRouter();
 
     // If goal is already selected, remove it; otherwise, add it (using filter)
@@ -23,13 +25,37 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
       });
     }
 
+    async function insertUserData() {
+      const { data: user } = await supabase.auth.getUser();
+
+      if (!user.user) {
+        return;
+      }
+
+      const { error } = await supabase
+        .from('users')
+        .insert({
+          id: user.user?.id,
+          username: username,
+          age: age,
+          current_weight: current_weight,
+          target_weight: target_weight,
+          height: height,
+          gender: gender,
+          goals: goals.length > 0 ? goals : null,
+        });
+
+      if (error) {
+        console.log('Error inserting user data:', error.message);
+      }
+    }
+
     // Submit handler
     async function onSubmit (data: User) {
       if (!data) {
         return;
       } 
 
-      const { email, password, username } = form.getValues();
       const { error } = await supabase.auth.signUp({
         email: email,
         password: password,
@@ -45,9 +71,10 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
         return;
       }
 
+      // Insert additional user data into the 'users' table
+      insertUserData();
+
       //Reset form after submission
-      console.log("email: ", email);
-      console.log("password: ", password);
       router.navigate('/LoginScreen')
       setPageNum({ page: 0 });
     }
