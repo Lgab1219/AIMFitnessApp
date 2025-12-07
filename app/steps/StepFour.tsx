@@ -15,15 +15,10 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
 
     // If goal is already selected, remove it; otherwise, add it (using filter)
     function toggleGoal(goal: Goals) {
-      setGoals(prevGoals => {
-        const updatedGoals = prevGoals.includes(goal) ? prevGoals.filter(g => g !== goal) : [...prevGoals, goal];
-        
-      // Update the form value for goals
-      setValue('goals', updatedGoals);
-
-      return updatedGoals;
-      });
+      setGoals(goal);
+      setValue('goals', goal);
     }
+
 
     async function insertUserData() {
       const { data: user } = await supabase.auth.getUser();
@@ -42,7 +37,7 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
           target_weight: target_weight,
           height: height,
           gender: gender,
-          goals: goals.length > 0 ? goals : null,
+          goal: goals
         });
 
       if (error) {
@@ -93,12 +88,6 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
             <Text style={{ color: '#ffffff' }}>Maintain Weight</Text>
             <Checkbox value={goals.includes(Goals.MaintainWeight)} onValueChange={() => toggleGoal(Goals.MaintainWeight)} />
 
-            <Text style={{ color: '#ffffff' }}>Improve body composition</Text>
-            <Checkbox value={goals.includes(Goals.BodyComposition)} onValueChange={() => toggleGoal(Goals.BodyComposition)} />
-              
-            <Text style={{ color: '#ffffff' }}>Become more fit</Text>
-            <Checkbox value={goals.includes(Goals.Fit)} onValueChange={() => toggleGoal(Goals.Fit)} />
-
         <TouchableHighlight underlayColor='#F0803C' onPress={handleSubmit(onSubmit)} >
           <View style={styles.buttonStyle}>
             <Text style={{ textAlign: 'center', padding: 10 }}>Submit</Text>
@@ -111,8 +100,8 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
 
 interface StepProps {
     form: UseFormReturn<User>;
-    goals: Goals[];
-    setGoals: React.Dispatch<React.SetStateAction<Goals[]>>;
+    goals: Goals;
+    setGoals: React.Dispatch<React.SetStateAction<Goals>>;
     setPageNum: React.Dispatch<React.SetStateAction<{ page: number }>>;
 }
 
