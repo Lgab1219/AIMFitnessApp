@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { Goals } from "../types";
 
 export default function DashboardScreen() {
 
@@ -21,6 +22,8 @@ export default function DashboardScreen() {
 
   // State to hold user data
   const [userData, setUserData] = useState<any>(null);
+
+  const [calorieBudget, setCalorieBudget] = useState<number>(0);
 
   // Router instance for navigation
   const router = useRouter();
@@ -71,37 +74,116 @@ export default function DashboardScreen() {
     router.navigate('/LoginScreen');
   }
 
-  async function generateStartingValues() {
+  const calculateCalories = (current_weight: number, height: number, age: number, gender: string, goal: string) => {
+
+    let bmr: number;
+    let maintain_weight: number;
+
+    // Mifflin-St Jeor Equation (these are BMR)
+    if (gender === 'male') {
+      bmr = (10 * current_weight) + (6.25 * height) - (5 * age) + 5;
+      maintain_weight = Math.ceil(bmr * 1.55);
+    } else {
+      // Equation for female gender
+      bmr = (10 * current_weight) + (6.25 * height) - (5 * age) - 161;
+      maintain_weight = Math.ceil(bmr * 1.55);
+    }
+
+    if (goal === Goals.GainWeight) {
+      return maintain_weight + 500;
+    }
+
+    if (goal === Goals.LoseWeight) {
+      return maintain_weight - 500;
+    }
+
+    if (goal === Goals.MaintainWeight) {
+      return maintain_weight;
+    }
+  }
+
+  // Check if calories_data does not exist yet. If so, generate starting values
+  useEffect(() => {
     if (!userData) return;
 
-    const prompt = `Generate personalized daily calorie budget, protein, carbohydrate, and fat intake values for a user based on the following profile:
-    Age: ${userData.age}
-    Gender: ${userData.gender}
-    Current Weight: ${userData.current_weight}
-    Target Weight: ${userData.target_weight}
-    Height: ${userData.height}
-    Goals: ${userData.goals}
-    `;
+    async function fetchCalorieBudget() {
+      const { data, error } = await supabase
+        .from('calories_data')
+        .select('calorie_budget')
+        .eq('user_id', userData.id)
+        .single();
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt
-    });
+      if (error) {
+        console.log("ERROR: ", error);
+        return;
+      }
+    
+      setCalorieBudget(data.calorie_budget);
+    }
 
-    console.log("AI Response: ", response.text);
+    async function checkCaloriesData() {
+      const { data, error } = await supabase
+        .from('calories_data')
+        .select('id')
+        .eq('user_id', userData.id)
+        .maybeSingle();
+
+      if (error) {
+        console.log("ERROR: ", error);
+        return;
+      }
+
+      // If data already exists, do not generate starting values but fetch current calorie budget
+      if (data) {
+        fetchCalorieBudget();
+        return;
+      }
+
+      // If data does not exist, calculate calorie budget based on user data
+      const budget = calculateCalories(
+        userData.current_weight,
+        userData.height,
+        userData.age,
+        userData.gender,
+        userData.goal
+      );
+
+      // Set calorie budget state to update current calorie budget value
+      setCalorieBudget(budget!);
+
+      // ...and then generate starting values to display on dashboard
+      generateStartingValues(budget!);
   }
+
+    async function generateStartingValues(budget: number) {
+      const { error } = await supabase
+        .from('calories_data')
+        .insert({
+          user_id: userData.id,
+          calorie_budget: budget,
+          current_calories: 0
+        });
+
+      if (error) {
+        console.log("ERROR: ", error);
+        return;
+      }
+    }
+
+    checkCaloriesData();
+  }, [userData]);
 
     return (
         <>
             <ScrollView style={{ flex: 1, backgroundColor: '#2E2D2D', paddingTop: '30%' }}>
                 <View style={styles.titleContainer}>
                     <Text style={{ color: '#ffffff', textAlign: 'center' }}>Calorie Budget</Text>
-                    <Text style={styles.titleStyle}>0</Text>
+                    <Text style={styles.titleStyle}>{calorieBudget}</Text>
                 </View>
 
                 <View style={styles.titleContainer}>
                     <Text style={{ color: '#ffffff', textAlign: 'center' }}>Current Calories</Text>
-                    <Text style={styles.titleStyle}>2,600</Text>
+                    <Text style={styles.titleStyle}>0</Text>
                 </View>
 
                 <View>
