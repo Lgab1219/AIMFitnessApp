@@ -21,7 +21,7 @@ export default function RegistrationScreen() {
         height: 0,
         age: 0,
         gender: 'male',
-        goals: []
+        goals: Goals.None
       }
     })
 
@@ -29,7 +29,7 @@ export default function RegistrationScreen() {
   const { trigger } = form;
 
   // State to hold the user's goals
-  const [goals, setGoals] = useState<Goals[]>([]);
+  const [goals, setGoals] = useState<Goals>(Goals.None);
 
   // State to hold the current page number
   const [pageNum, setPageNum] = useState<PageNum>({

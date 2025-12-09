@@ -4,8 +4,7 @@ export enum Goals {
   LoseWeight = 'lose_weight',
   MaintainWeight = 'maintain_weight',
   GainWeight = 'gain_weight',
-  BodyComposition = 'body_composition',
-  Fit = "fit"
+  None = 'none'
 }
 
 export interface User {
@@ -17,7 +16,7 @@ export interface User {
   height: number;
   age: number;
   gender: Gender;
-  goals: Goals[];
+  goals: Goals;
 }
 
 const dummy = {};
