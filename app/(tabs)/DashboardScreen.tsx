@@ -45,6 +45,7 @@ export default function DashboardScreen() {
 
   // Fetch current calories
   useEffect(() => {
+
     async function fetchCurrentCalories() {
       const { data: user } = await supabase.auth.getUser();
 
@@ -58,7 +59,7 @@ export default function DashboardScreen() {
         return;
       }
 
-      setCurrentCalories(data[0].current_calories ?? 0);
+      setCurrentCalories(data?.[0]?.current_calories ?? 0);
     }
 
     fetchCurrentCalories();

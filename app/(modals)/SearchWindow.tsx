@@ -24,7 +24,6 @@ export default function SearchWindow() {
     const [currentCalories, setCurrentCalories] = useState<number>(0);
 
     async function handleSearch(query: string) {
-
       if (!query) {
         return;
       }
@@ -51,15 +50,10 @@ export default function SearchWindow() {
 
         setUserId(id);
       
-        const { data: calories, error: calorieError } = await supabase
+        const { data: calories } = await supabase
           .from('calories_data')
           .select('current_calories')
           .eq('user_id', user.user?.id);
-      
-        if (calorieError) {
-          console.log("ERROR fetching calories: ", calorieError);
-          return;
-        }
       
         if (calories) {
           setCurrentCalories(calories[0].current_calories);
@@ -69,26 +63,58 @@ export default function SearchWindow() {
       fetchCurrentCalories();
     }, []);
 
+    // Along with fetchCalories inside the useEffect, update the calories and check for the limit of the calories.
     async function updateCurrentCalories(newCalories: number) {
-      setCurrentCalories((prevCalories) => prevCalories + newCalories);
+      
+      const updatedCalories = currentCalories + newCalories;
+
+      setCurrentCalories(updatedCalories);
 
       const { error } = await supabase
         .from('calories_data')
-        .update({ current_calories: currentCalories + newCalories })
+        .update({ current_calories: updatedCalories })
         .eq('user_id', userId);
+
+      await checkLimit(updatedCalories);
 
       if (error) {
         console.log("ERROR updating calories: ", error);
         return;
       }
 
-      router.replace('/DashboardScreen');
+
+      router.navigate('/DashboardScreen');
     }
 
+    async function checkLimit(currentCalories: number) {
+      const { data: user } = await supabase.auth.getUser();
 
+      const { data, error } = await supabase
+        .from('calories_data')
+        .select('calorie_budget')
+        .eq('user_id', user.user?.id)
+        .single();
+
+      if (error) {
+        console.log("ERROR: ", error);
+        return;
+      }
+
+      if (currentCalories > data.calorie_budget) {
+        const excessCalories = currentCalories - data.calorie_budget;
+
+        const { error } = await supabase
+        .from('calories_data')
+        .update({ current_calories: excessCalories })
+        .eq('user_id', userId);
+
+        if (error) {
+          console.log("Error updating max limit calories:", error);
+        }
+    } else return;
+  }
 
     return (
-      <>
             <ScrollView style={{ flex: 1, backgroundColor: '#E0E0E0', paddingTop: 50 }}>
                 <View style={styles.titleContainer}>
                     <TouchableHighlight underlayColor='#E0E0E0' style={{ backgroundColor: '#E0E0E0', marginBottom: '20%' }}
@@ -109,18 +135,17 @@ export default function SearchWindow() {
                 </View>
                 <View style={styles.foodsContainer}>
                     {searchResults ? searchResults.map((food) => (
-                      <TouchableHighlight style={styles.food} key={food.id} 
+                      <TouchableHighlight style={styles.food} key={food.id ?? Math.random().toString()} 
                       underlayColor= '#e6733c' 
                       onPress={() => {updateCurrentCalories(food.calories ?? 0)}}>
-                        <>
-                        <Text>{food.name}</Text>
-                        <Text>Calories: {food.calories}</Text>
-                        </>
+                        <View>
+                          <Text>{food.name}</Text>
+                          <Text>Calories: {food.calories}</Text>
+                        </View>
                       </TouchableHighlight> 
                     )) : <Text>No results found.</Text>}
                 </View>
             </ScrollView>
-      </>
     )
 }
 
