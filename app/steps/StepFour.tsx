@@ -79,14 +79,20 @@ export default function StepFour({ form, goals, setGoals, setPageNum }: StepProp
         <View style={styles.titleContainer}>
           <Text style={styles.titleStyle}>Final Step</Text>
 
-            <Text style={{ color: '#ffffff' }}>Lose Weight</Text>
-            <Checkbox value={goals.includes(Goals.LoseWeight)} onValueChange={() => toggleGoal(Goals.LoseWeight)} />
+            <View style={{ backgroundColor: '#ffffff', gap: 5, paddingVertical: 15, paddingInline: 20 }}>
+              <Text>Lose Weight</Text>
+              <Checkbox value={goals.includes(Goals.LoseWeight)} onValueChange={() => toggleGoal(Goals.LoseWeight)} />
+            </View>
 
-            <Text style={{ color: '#ffffff' }}>Gain Weight</Text>
-            <Checkbox value={goals.includes(Goals.GainWeight)} onValueChange={() => toggleGoal(Goals.GainWeight)} />
+            <View style={{ backgroundColor: '#ffffff', gap: 5, paddingVertical: 15, paddingInline: 20 }}>
+              <Text>Gain Weight</Text>
+              <Checkbox value={goals.includes(Goals.GainWeight)} onValueChange={() => toggleGoal(Goals.GainWeight)} />
+            </View>
 
-            <Text style={{ color: '#ffffff' }}>Maintain Weight</Text>
-            <Checkbox value={goals.includes(Goals.MaintainWeight)} onValueChange={() => toggleGoal(Goals.MaintainWeight)} />
+            <View style={{ backgroundColor: '#ffffff', gap: 5, paddingVertical: 15, paddingInline: 20 }}>
+              <Text>Maintain Weight</Text>
+              <Checkbox value={goals.includes(Goals.MaintainWeight)} onValueChange={() => toggleGoal(Goals.MaintainWeight)} />
+            </View>
 
         <TouchableHighlight underlayColor='#F0803C' onPress={handleSubmit(onSubmit)} >
           <View style={styles.buttonStyle}>

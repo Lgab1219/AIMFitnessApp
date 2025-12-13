@@ -17,6 +17,10 @@ export default function TabLayout() {
         <Tabs.Screen name='DashboardScreen' options={{
           title: 'Home'
         }} />
+
+        <Tabs.Screen name='CoachScreen' options={{
+          title: 'AI Coach'
+        }} />
     </Tabs>
   );
 }

@@ -1,5 +1,6 @@
 import supabase from '@/supabase';
 import { Link, useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, View } from 'react-native';
 import { User } from './types';
@@ -12,6 +13,9 @@ export default function LoginScreen() {
       password: ''
     }
   })
+
+  const [accountInputError, setAccountInputError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   // Initializing router for conditional route navigation
   const router = useRouter();
@@ -35,11 +39,13 @@ async function onSubmit(data: User) {
   })
 
   if (error) {
-    console.log("ERROR: ", error);
+    setErrorMessage(error.message);
     return;
   }
 
-  router.navigate('/(tabs)/DashboardScreen');
+  setTimeout(() => {
+    router.navigate('/(tabs)/DashboardScreen');
+  }, 1000);
 }
 
 
@@ -80,6 +86,10 @@ async function onSubmit(data: User) {
             <Text style={{ textAlign: 'center', padding: 10 }}>Login</Text>
           </View>
         </TouchableHighlight>
+      </View>
+
+      <View style={{ display: 'flex', alignItems: 'center', marginTop: 30 }}>
+        { errorMessage ? <Text style={{ color: '#ffffff' }}>{errorMessage}</Text> : '' }
       </View>
 
         <View style={{ width: '100%' }}>

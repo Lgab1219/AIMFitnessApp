@@ -1,5 +1,4 @@
 import supabase from "@/supabase";
-import { GoogleGenAI } from "@google/genai";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
@@ -7,23 +6,11 @@ import { Goals } from "../types";
 
 export default function DashboardScreen() {
 
-  // Create seperate AI file to use fetched values to generate starting values (calorie budget) for user profile
-  // Before generating values, check if user profile already has values set
-  // Turn AI's string output and store into a variable to be displayed on the dashboard screen
-
-  const googleApiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY as string;
-
-  if (!googleApiKey) {
-    console.log("Google API Key is missing");
-  }
-
-  // Initialize AI client
-  const ai = new GoogleGenAI({ apiKey: googleApiKey });
-
-  // State to hold user data
   const [userData, setUserData] = useState<any>(null);
 
   const [calorieBudget, setCalorieBudget] = useState<number>(0);
+
+  const [currentCalories, setCurrentCalories] = useState<number>(0);
 
   // Router instance for navigation
   const router = useRouter();
@@ -56,12 +43,27 @@ export default function DashboardScreen() {
     fetchUserData();
   }, []);
 
-  // Generate starting values when userData is set
-/*  useEffect(() => {
-    if (userData) {
-      generateStartingValues();
+  // Fetch current calories
+  useEffect(() => {
+
+    async function fetchCurrentCalories() {
+      const { data: user } = await supabase.auth.getUser();
+
+      const { data, error } = await supabase
+      .from('calories_data')
+      .select('current_calories')
+      .eq('user_id', user.user?.id);
+
+      if (error) {
+        console.log("Fetch current calories error: ", error);
+        return;
+      }
+
+      setCurrentCalories(data?.[0]?.current_calories ?? 0);
     }
-  }, [userData]);*/
+
+    fetchCurrentCalories();
+  }, []);
 
   async function logOut() {
     const { error } = await supabase.auth.signOut();
@@ -183,7 +185,7 @@ export default function DashboardScreen() {
 
                 <View style={styles.titleContainer}>
                     <Text style={{ color: '#ffffff', textAlign: 'center' }}>Current Calories</Text>
-                    <Text style={styles.titleStyle}>0</Text>
+                    <Text style={styles.titleStyle}>{currentCalories}</Text>
                 </View>
 
                 <View>
