@@ -124,7 +124,7 @@ export default function CoachScreen() {
 
         const data = await response.json();
 
-        const aiMessage = data.reply;
+        const aiMessage = data.result;
 
         const { error: replyError } = await supabase
         .from('messages')
