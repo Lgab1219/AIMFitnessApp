@@ -13,6 +13,7 @@ export default function CoachScreen() {
 
     const [messageInput, setMessageInput] = useState<string>('');
     const [messageList, setMessageList] = useState<Message[]>([]);
+    const geminiURL = `https://aim-fitness-app.vercel.app/api/gemini`;
 
     // Detects if there are any sent messages, and updates the fetchMessages useEffect.
     const [updateMessages, toggleUpdateMessages] = useState<boolean>(false);
@@ -51,7 +52,7 @@ export default function CoachScreen() {
         If you have understood, introduce yourself briefly to the user.
         `;
 
-        const response = await fetch('http://192.168.1.6:3000/ai', {
+        const response = await fetch(geminiURL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: prompt })
@@ -115,7 +116,7 @@ export default function CoachScreen() {
         const { data: user } = await supabase.auth.getUser();
         if (!user) return;
 
-        const response = await fetch('http://192.168.1.6:3000/ai', {
+        const response = await fetch(geminiURL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: messageInput })
