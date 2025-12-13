@@ -21,6 +21,53 @@ export default function CoachScreen() {
         setMessageInput(text);
     }
 
+    useEffect(() => {
+        async function checkStarterPrompt() {
+            const { data } = await supabase.auth.getUser();
+            if (!data) return;
+
+            if (data.user?.user_metadata.starter_prompt_generated) return;
+
+            await generateStarterPrompt(data.user?.id as string);
+
+            await supabase.auth.updateUser({ 
+                data: { starter_prompt_generated: true }
+             });
+
+             await supabase.auth.refreshSession();
+             toggleUpdateMessages(prev => !prev);
+        }
+
+        checkStarterPrompt();
+    }, []);
+
+    async function generateStarterPrompt(userID: string) {
+        const prompt: string = `
+        You are a friendly AI Health and Fitness Coach.
+
+        Instructions:
+        - Help user answer their questions only related to health and fitness
+
+        If you have understood, introduce yourself briefly to the user.
+        `;
+
+        const response = await fetch('http://192.168.1.6:3000/ai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: prompt })
+        });
+
+        const data = await response.json();
+
+        await supabase.from('messages').insert({
+            user_id: userID,
+            message: data.reply,
+            sender: 'ai'
+        })
+        .select('*')
+        .single();
+    }
+
     async function sendMessage() {
         const { data: user } = await supabase.auth.getUser();
         if (!user) return;
@@ -90,7 +137,7 @@ export default function CoachScreen() {
 
         if (replyError) return;
 
-        toggleUpdateMessages(!updateMessages);
+        toggleUpdateMessages(prev => !prev);
     }
 
     return (
@@ -106,7 +153,7 @@ export default function CoachScreen() {
             <View style={styles.messagesContainer}>
               {messageList.map((msg) => (
                 <View
-                  key={msg.id}
+                  key={msg.id ?? msg.created_at}
                   style={[
                     styles.bubble,
                     msg.sender === "user" ? styles.userBubble : styles.aiBubble
@@ -140,6 +187,7 @@ const styles = StyleSheet.create({
     chatHeader: {
         backgroundColor: '#f0803c',
         padding: 20,
+        paddingTop: 50
     },
 
     headerText: {
