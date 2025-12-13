@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
     chatHeader: {
         backgroundColor: '#f0803c',
         padding: 20,
+        paddingTop: 50
     },
 
     headerText: {
