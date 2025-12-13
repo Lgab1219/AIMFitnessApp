@@ -4,7 +4,7 @@
     "slug": "AIM",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/aim-logo.png",
     "scheme": "aim",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
