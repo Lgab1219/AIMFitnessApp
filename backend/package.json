@@ -13,6 +13,7 @@
   "type": "commonjs",
   "dependencies": {
     "@google/genai": "^1.33.0",
-    "@vercel/node": "^5.5.15"
+    "@vercel/node": "^5.5.15",
+    "dotenv": "^17.2.3"
   }
 }
