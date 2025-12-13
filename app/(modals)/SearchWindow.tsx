@@ -30,7 +30,7 @@ export default function SearchWindow() {
 
       try {
         // Client asks server for search results based on query
-        const res = await fetch(`http://192.168.1.6:3000/search?query=${encodeURIComponent(query)}`);
+        const res = await fetch(`https://aim-fitness-app.vercel.app/api/usda?query=${query}`);
 
         // Turn received response from server into JSON
         const data = await res.json();
