@@ -2,6 +2,8 @@ import { Stack } from "expo-router";
 
 export default function ModalLayout() {
     return (
-        <Stack screenOptions={{ headerShown: false, presentation: 'transparentModal', animation: 'fade' }} />
+        <Stack screenOptions={{ headerShown: false, presentation: 'transparentModal', animation: 'fade' }}>
+            <Stack.Screen name="ExceedCaloriesWindow" options={{ animation: 'slide_from_left' }} />
+        </Stack>
     );
 }
