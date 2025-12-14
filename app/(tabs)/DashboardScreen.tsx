@@ -2,6 +2,7 @@ import supabase from "@/supabase";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import ExceedCaloriesWindow from "../(modals)/ExceedCaloriesWindow";
 import { Goals } from "../types";
 
 export default function DashboardScreen() {
@@ -11,6 +12,10 @@ export default function DashboardScreen() {
   const [calorieBudget, setCalorieBudget] = useState<number>(0);
 
   const [currentCalories, setCurrentCalories] = useState<number>(0);
+
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const [exceedCalorieWindow, toggleCalorieWindow] = useState<boolean>(false);
 
   // Router instance for navigation
   const router = useRouter();
@@ -49,6 +54,10 @@ export default function DashboardScreen() {
     async function fetchCurrentCalories() {
       const { data: user } = await supabase.auth.getUser();
 
+      const id = user.user?.id || null;
+
+      setUserId(id)
+
       const { data, error } = await supabase
       .from('calories_data')
       .select('current_calories')
@@ -59,7 +68,10 @@ export default function DashboardScreen() {
         return;
       }
 
-      setCurrentCalories(data?.[0]?.current_calories ?? 0);
+      const calories = data?.[0]?.current_calories ?? 0;
+
+      setCurrentCalories(calories);
+      checkLimit(calories);
     }
 
     fetchCurrentCalories();
@@ -102,6 +114,44 @@ export default function DashboardScreen() {
     if (goal === Goals.MaintainWeight) {
       return maintain_weight;
     }
+  }
+
+    async function checkLimit(currentCalories: number) {
+      const { data: user } = await supabase.auth.getUser();
+
+      const { data, error } = await supabase
+        .from('calories_data')
+        .select('calorie_budget')
+        .eq('user_id', user.user?.id)
+        .single();
+
+      if (error) {
+        console.log("ERROR: ", error);
+        return;
+      }
+
+      if (currentCalories > data.calorie_budget) {
+        const excessCalories = currentCalories - data.calorie_budget;
+
+        setCurrentCalories(excessCalories);
+
+        const { error } = await supabase
+        .from('calories_data')
+        .update({ current_calories: excessCalories })
+        .eq('user_id', user.user?.id);
+
+        if (error) {
+          console.log("Error updating max limit calories:", error);
+        }
+
+
+        toggleCalorieWindow(prev => !prev);
+
+        setTimeout(() => {
+          toggleCalorieWindow(prev => !prev);
+        }, 5000);
+
+    } else return;
   }
 
   // Check if calories_data does not exist yet. If so, generate starting values
@@ -178,6 +228,7 @@ export default function DashboardScreen() {
     return (
         <>
             <ScrollView style={{ flex: 1, backgroundColor: '#2E2D2D', paddingTop: '30%' }}>
+                { exceedCalorieWindow ? <ExceedCaloriesWindow /> : null }
                 <View style={styles.titleContainer}>
                     <Text style={{ color: '#ffffff', textAlign: 'center' }}>Calorie Budget</Text>
                     <Text style={styles.titleStyle}>{calorieBudget}</Text>
