@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableHighlight, View } from "react-native";
 import supabase from "../../supabase";
 
-type Food = [{
+type Food = {
   id?: number,
   name?: string,
   calories?: number
-}]
+}
 
 export default function SearchWindow() {
 
@@ -17,7 +17,7 @@ export default function SearchWindow() {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
     // State holding the search results for viewing
-    const [searchResults, setSearchResults] = useState<Food>([{}]);
+    const [searchResults, setSearchResults] = useState<Food[]>([]);
 
     const [userId, setUserId] = useState<string | null>(null);
 
@@ -33,9 +33,9 @@ export default function SearchWindow() {
         const res = await fetch(`https://aim-fitness-app.vercel.app/api/usda?query=${query}`);
 
         // Turn received response from server into JSON
-        const data = await res.json();
+        const data: Food[] = await res.json();
 
-        setSearchResults(data.foods);
+        setSearchResults(data);
       } catch (error) {
         console.error("Error fetching search results: ", error);
       }
@@ -75,44 +75,13 @@ export default function SearchWindow() {
         .update({ current_calories: updatedCalories })
         .eq('user_id', userId);
 
-      await checkLimit(updatedCalories);
-
       if (error) {
         console.log("ERROR updating calories: ", error);
         return;
       }
 
-
       router.navigate('/DashboardScreen');
     }
-
-    async function checkLimit(currentCalories: number) {
-      const { data: user } = await supabase.auth.getUser();
-
-      const { data, error } = await supabase
-        .from('calories_data')
-        .select('calorie_budget')
-        .eq('user_id', user.user?.id)
-        .single();
-
-      if (error) {
-        console.log("ERROR: ", error);
-        return;
-      }
-
-      if (currentCalories > data.calorie_budget) {
-        const excessCalories = currentCalories - data.calorie_budget;
-
-        const { error } = await supabase
-        .from('calories_data')
-        .update({ current_calories: excessCalories })
-        .eq('user_id', userId);
-
-        if (error) {
-          console.log("Error updating max limit calories:", error);
-        }
-    } else return;
-  }
 
     return (
             <ScrollView style={{ flex: 1, backgroundColor: '#E0E0E0', paddingTop: 50 }}>
