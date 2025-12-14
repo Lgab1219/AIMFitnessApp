@@ -98,7 +98,7 @@ export default function SearchWindow() {
                     placeholder="Search..." 
                     value={searchQuery}
                     onChangeText={(text) => setSearchQuery(text)}/>
-                    <TouchableHighlight underlayColor='#e6733c' style={styles.buttonStyle}>
+                    <TouchableHighlight underlayColor='#e0e0e0' style={styles.buttonStyle}>
                       <Text style={{ color: '#FFFFFF', textAlign: 'center', fontSize: 18, fontWeight: '600' }} onPress={() => handleSearch(searchQuery)}>Search</Text>
                     </TouchableHighlight>
                 </View>
