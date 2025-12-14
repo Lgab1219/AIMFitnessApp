@@ -17,6 +17,8 @@ export default async function gemini(req: VercelRequest, res: VercelResponse) {
         model: 'gemini-2.5-flash',
         contents: message
     })
+
+    const reply = result?.text;
     
-    return res.status(200).json({ result });
+    return res.status(200).json({ reply });
 }

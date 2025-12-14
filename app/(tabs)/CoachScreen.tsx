@@ -14,6 +14,7 @@ export default function CoachScreen() {
     const [messageInput, setMessageInput] = useState<string>('');
     const [messageList, setMessageList] = useState<Message[]>([]);
     const geminiURL = `https://aim-fitness-app.vercel.app/api/gemini`;
+    const mockGeminiURL = `https://aim-fitness-app.vercel.app/api/gemini-mock`;
 
     // Detects if there are any sent messages, and updates the fetchMessages useEffect.
     const [updateMessages, toggleUpdateMessages] = useState<boolean>(false);
@@ -122,9 +123,15 @@ export default function CoachScreen() {
             body: JSON.stringify({ message: messageInput })
         });
 
-        const data = await response.json();
+        if (!response.ok) {
+            console.log("Gemini request failed: ", response.text());
+            return;
+        }
 
-        const aiMessage = data.result;
+        const data = await response.json();
+        console.log("Gemini Instant Reply: ", data.reply);
+
+        const aiMessage = data.reply;
 
         const { error: replyError } = await supabase
         .from('messages')
